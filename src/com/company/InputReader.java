@@ -24,6 +24,12 @@ public class InputReader {
 
                 IntLines.add(IntLine);
             }
+            else{
+                ArrayList<Integer> IntLine= new ArrayList<Integer>();
+                //-2 means it is an empty line
+                IntLine.add(-2);
+                IntLines.add(IntLine);
+            }
         }
         return IntLines;
     }

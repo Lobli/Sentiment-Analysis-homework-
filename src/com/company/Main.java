@@ -123,7 +123,7 @@ public class Main {
         //Sum of the positive and negative lines
         for(int i=0; i<PossibilityArray.size();i++){
             if(PossibilityArray.get(i)==1){
-            AllPosLine+=1;
+                AllPosLine+=1;
             }
             if(PossibilityArray.get(i)==0) {
                 AllNegLine += 1;
@@ -217,16 +217,27 @@ public class Main {
         //array of the lines that we learn
         ArrayList<ArrayList<Integer>> KnownLineArray = reader.readKnownLines();
 
-
+        /*
+        int EmptyLines=0;
+        for (int i=0;i<KnownLineArray.size();i++){
+            ArrayList<Integer> temp= KnownLineArray.get(i);
+            if (temp.get(0)==-2){
+                EmptyLines+=1;
+            }
+        }
+        System.out.println("Emptylines: "+ EmptyLines);
+        System.out.println("KnownArraySize:" +KnownLineArray.size());
+        */
         //array of the possibilities that we learn
         ArrayList<Integer> PossibilityArray = reader.readPossibilities();
-
+        //System.out.println("PossibilitySize:"+PossibilityArray.size());
         //array of the known words
         ArrayList<SmartWord> Vocabulary;
 
         // Make the Vocabulary from the known lines and possibilities
         Vocabulary=makeVocabulary(KnownLineArray,PossibilityArray);
         ArrayList<ArrayList<Integer>> UnknownLineArray = reader.readUnknownLines();
+
 
         /*
         System.out.print("KnownLineArray:");
