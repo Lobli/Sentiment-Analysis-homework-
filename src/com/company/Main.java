@@ -9,6 +9,25 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Main {
 
+    public static void main(String[] args) {
+        InputReader reader = new InputReader();
+
+        //array of the lines that we learn
+        ArrayList<ArrayList<Integer>> KnownLineArray = reader.readKnownLines();
+
+        //array of the possibilities that we learn
+        ArrayList<Integer> PossibilityArray = reader.readPossibilities();
+       
+        //array of the known words
+        ArrayList<SmartWord> Vocabulary;
+
+        // Make the Vocabulary from the known lines and possibilities
+        Vocabulary=makeVocabulary(KnownLineArray,PossibilityArray);
+        ArrayList<ArrayList<Integer>> UnknownLineArray = reader.readUnknownLines();
+
+        calculateSolution(UnknownLineArray,Vocabulary,PossibilityArray);
+    }
+
     static ArrayList<SmartWord> makeVocabulary (ArrayList<ArrayList<Integer>> LineArray, ArrayList<Integer> PossibilityArray){
         ArrayList<SmartWord> Vocabulary = new ArrayList<>();
         for (int i=0; i<LineArray.size();i++){
@@ -21,7 +40,9 @@ public class Main {
         return Vocabulary;
     }
 
-    static ArrayList<SmartWord> addWordsToVocabularyFromLine (ArrayList<Integer> CurrentLine,ArrayList<SmartWord> Vocabulary,int PossibilityForCurrentLine){
+    static ArrayList<SmartWord> addWordsToVocabularyFromLine (ArrayList<Integer> CurrentLine,
+                                                              ArrayList<SmartWord> Vocabulary,
+                                                              int PossibilityForCurrentLine){
         for (int j=0; j<CurrentLine.size();j++) {
             if (Vocabulary.size() != 0){
                TryToAddWordToVocabulary(Vocabulary, CurrentLine.get(j),PossibilityForCurrentLine);
@@ -106,7 +127,9 @@ public class Main {
         }
     }
 
-    static void calculateSolution (ArrayList<ArrayList<Integer>> UnknownLineArray,ArrayList<SmartWord> Vocabulary, ArrayList<Integer> PossibilityArray) {
+    static void calculateSolution (ArrayList<ArrayList<Integer>> UnknownLineArray,
+                                   ArrayList<SmartWord> Vocabulary, 
+                                   ArrayList<Integer> PossibilityArray) {
 
         int AllPos=0;
         int AllNeg=0;
@@ -130,24 +153,11 @@ public class Main {
             }
         }
 
-        /*
-        System.out.println("Allpos: "+AllPos);
-        System.out.println("Allneg: "+AllNeg);
-
-        System.out.println("AllPosLine: "+AllPosLine);
-        System.out.println("AllNegLine: "+AllNegLine+"\n");
-        */
-
         for (int i=0;i<UnknownLineArray.size();i++){
+
             ArrayList<Integer> PosValuesInCurrentLine = new ArrayList<>();
             ArrayList<Integer> NegValuesInCurrentLine = new ArrayList<>();
             ArrayList<Integer> CurrentLine = UnknownLineArray.get(i);
-
-            /*itt kigyujtom, hogy az egyes szavak amik benne vannak
-             a sorban hanyszor fordulnak elo a tanitomintaban a
-             pozitiv vagy a negativ sorokban es csinalok egy pozitiv ertekes tombot (PosValuesInCurrentLine)
-             meg egy negativosat (PosValuesInCurrentLine)
-            */
 
             for(int j=0;j<CurrentLine.size();j++){
                 boolean contains=false;
@@ -165,100 +175,26 @@ public class Main {
                     }
                 }
                 if(contains==false){
-                    // if we can't find the word int the vocabulary it was 0 times in pos/neg lines
-
+                // if we can't find the word int the vocabulary it was 0 times in pos/neg lines
                     PosValuesInCurrentLine.add(0);
                     NegValuesInCurrentLine.add(0);
                 }
             }
-
             //calculate the possibility that a line is positive/negative (allPositiveLines/allLines) and allNegativeLines/allLines
             double PositivePossibilityForLine =(double)AllPosLine/PossibilityArray.size();
             double NegativePossibilityForLine =(double)AllNegLine/PossibilityArray.size();
+            //calculate pos/neg value for current line
+            for(int j = 0; j < CurrentLine.size(); j++){
 
-            /*
-            System.out.println("PositivePossibilityForLine: "+PositivePossibilityForLine);
-            System.out.println("NegativePossibilityForLine: "+ NegativePossibilityForLine);
-            */
+                double CurrentWordPos= (double)(PosValuesInCurrentLine.get(j)+1)/(Vocabulary.size()+AllPos);
+                double CurrentWordNeg= (double)(NegValuesInCurrentLine.get(j)+1)/(Vocabulary.size()+AllNeg);
 
-                //calculate pos/neg value for current line
-                for(int j = 0; j < CurrentLine.size(); j++){
-
-                    double CurrentWordPos= (double)(PosValuesInCurrentLine.get(j)+1)/(Vocabulary.size()+AllPos);
-                    double CurrentWordNeg= (double)(NegValuesInCurrentLine.get(j)+1)/(Vocabulary.size()+AllNeg);
-
-                    /*
-                    System.out.println("\n"+"CurrentWord:"+ CurrentLine.get(j));
-                    System.out.println("CurrentWordPos: "+CurrentWordPos);
-                    System.out.println("CurrentWordNeg: "+ CurrentWordNeg+"\n");
-                    */
-
-                    PositivePossibilityForLine = PositivePossibilityForLine*CurrentWordPos;
-                    NegativePossibilityForLine = NegativePossibilityForLine*CurrentWordNeg;
-                }
-
-                /*
-                System.out.println((i+1)+". ROW :");
-                //System.out.println("PositivePossibilityForAllLines: "+PositivePossibilityForAll+" NegativePossibilityForAllLines: "+NegativePossibilityForAll);
-                System.out.println("PosValue:"+PositivePossibilityForLine);
-                System.out.println("NegValue:"+NegativePossibilityForLine);
-                */
-
-                //compare the values and than print out the solution
-                PrintLineSolution(PositivePossibilityForLine,NegativePossibilityForLine);
-                //PrintLineSolutionWithDetails(PositivePossibilityForLine,NegativePossibilityForLine);
-        }
-    }
-
-    public static void main(String[] args) {
-
-        InputReader reader = new InputReader();
-
-        //array of the lines that we learn
-        ArrayList<ArrayList<Integer>> KnownLineArray = reader.readKnownLines();
-
-        /*
-        int EmptyLines=0;
-        for (int i=0;i<KnownLineArray.size();i++){
-            ArrayList<Integer> temp= KnownLineArray.get(i);
-            if (temp.get(0)==-2){
-                EmptyLines+=1;
+                PositivePossibilityForLine = PositivePossibilityForLine*CurrentWordPos;
+                NegativePossibilityForLine = NegativePossibilityForLine*CurrentWordNeg;
             }
+            //compare the values and than print out the solution
+            PrintLineSolution(PositivePossibilityForLine,NegativePossibilityForLine);
+            //PrintLineSolutionWithDetails(PositivePossibilityForLine,NegativePossibilityForLine);
         }
-        System.out.println("Emptylines: "+ EmptyLines);
-        System.out.println("KnownArraySize:" +KnownLineArray.size());
-        */
-        //array of the possibilities that we learn
-        ArrayList<Integer> PossibilityArray = reader.readPossibilities();
-        //System.out.println("PossibilitySize:"+PossibilityArray.size());
-        //array of the known words
-        ArrayList<SmartWord> Vocabulary;
-
-        // Make the Vocabulary from the known lines and possibilities
-        Vocabulary=makeVocabulary(KnownLineArray,PossibilityArray);
-        ArrayList<ArrayList<Integer>> UnknownLineArray = reader.readUnknownLines();
-
-
-        /*
-        System.out.print("KnownLineArray:");
-        System.out.println(KnownLineArray+"\n");
-
-        System.out.print("PossibilityArray: ");
-        System.out.println(PossibilityArray+"\n");
-
-        System.out.print("UnknownLineArray:");
-        System.out.println(UnknownLineArray+"\n");
-
-
-        System.out.println("\n"+"Vocabulary:");
-        for (int i = 0; i< Vocabulary.size(); i++){
-            Vocabulary.get(i).print();
-        }
-        System.out.println();
-        */
-
-
-        calculateSolution(UnknownLineArray,Vocabulary,PossibilityArray);
-
     }
 }
